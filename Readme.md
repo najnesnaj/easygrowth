@@ -1,3 +1,3 @@
 #EasyGrowth
 
-data, scripts
+ideas
