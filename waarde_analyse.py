@@ -72,12 +72,14 @@ def schat_waarde(symbool):
     #print (dhr._analysis)
     #print (dhr._fundamentals)
     KOERSWINST=0
+    koerswinst=0
     try:
         koerswinst = dhr.info['trailingPE']
-    except KeyError:
+    except KeyError or TypeError:
         koerswinst = 1000
-    if type(koerswinst)==type(None):
+    if type(koerswinst)==type(None) or type(koerswinst)==type(str) or koerswinst == 'Infinity':
         koerswinst = 1000
+    print ("koers-test", koerswinst)
     #if data is not present we do not want a positive result ...
     #print ("koers winst", koerswinst) 
     if koerswinst < 5:
@@ -125,10 +127,12 @@ def schat_waarde(symbool):
     #print ("de notering tov maart 2020 COVID")
    #print ("de waardering tov COVID-LOW =",COVID_VALUE) 
 
-
-    if (type(dhr.info['beta']) != type(None) ):
+    try:
         beta = dhr.info['beta']
-    else:
+    except KeyError:
+        beta = 99999999
+
+    if (type(beta) == type(None) ):
         beta = 99999999
     WAARDE_BETA = 0
     if beta < 0.3:
@@ -158,7 +162,8 @@ def schat_waarde(symbool):
         pricesales = dhr.info['priceToSalesTrailing12Months']
     except KeyError:
         pricesales = 0
-
+    if type(pricesales) == type(None):
+        pricesales=0
     WAARDE_PRICESALES=0
     if pricesales < 0.2:
         WAARDE_PRICESALES=WAARDE_PRICESALES+1
@@ -188,9 +193,11 @@ def schat_waarde(symbool):
     #else:
     #    aantalaandelen = 0
     #'regularMarketPrice'
-    if (type(dhr.info['currentPrice']) != type(None) ):
+    try:
         prijs = dhr.info['currentPrice']
-    else:
+    except KeyError:
+        prijs = 0
+    if (type(prijs) == type(None) ):
         prijs = 0
     marketcap = aantalaandelen * prijs
     color = ""
@@ -198,9 +205,12 @@ def schat_waarde(symbool):
     '''
     ebitda
     '''
-    if (type(dhr.info['enterpriseToEbitda']) != type(None) ):
+    try:
         enterpebitda = dhr.info['enterpriseToEbitda']
-    else:
+    except KeyError:
+        enterpebitda = 999999999
+
+    if (type(enterpebitda) == type(None) ):
         enterpebitda = 999999999
     WAARDE_EBITDA=0
     if enterpebitda < 2:
@@ -533,8 +543,18 @@ def schat_waarde(symbool):
     #print (pnl.info())
     
     pricetarget=dhr.analyst_price_target
-    huidige_prijs = (pricetarget.T['currentPrice'][0])
-    geschatte_prijs = (pricetarget.T['targetMeanPrice'][0])
+    try:
+        huidige_prijs = (pricetarget.T['currentPrice'][0])
+    except:
+        huidige_prijs = 0
+    if type(huidige_prijs)==type(None):
+        huidige_prijs = 0
+    try:
+        geschatte_prijs = (pricetarget.T['targetMeanPrice'][0])
+    except:
+        geschatte_prijs=0
+    if type(geschatte_prijs)==type(None):
+        geschatte_prijs=0
     
     if type(huidige_prijs) == type(None) or type(geschatte_prijs) == type(None):
         huidige_prijs=0
@@ -602,8 +622,11 @@ def schat_waarde(symbool):
     #print (dhr._scrape_url)
     #print (dhr.major_holders)
     #print(dhr.major_holders.iloc[0][0])
-    perc_major_holder = float(dhr.major_holders.iloc[0][0].strip('%'))
-    
+    try:
+        perc_major_holder = float(dhr.major_holders.iloc[0][0].strip('%'))
+    except ValueError:
+        perc_major_holder = 0 
+         
     
     #this is the percentage held by insiders 
     #the more the better
@@ -665,6 +688,6 @@ def schat_waarde(symbool):
     print ("TOTAAL (128) = ", TOTAAL)
     return (TOTAAL)
 
-totaal=schat_waarde('PAAL-B.CO')
+totaal=schat_waarde('BEKB.BR')
 print ("---------------------------")
 print ("de geschatte waarde = ",totaal)
